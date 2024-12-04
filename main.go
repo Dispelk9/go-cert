@@ -22,8 +22,8 @@ func main() {
 	// Handle fetch-cert endpoint using the fetchCertHandler function
         http.HandleFunc("/fetch-cert", fetchCertHandler)
 
-	fmt.Println("Server is running on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Println("Server is running on http://localhost:5000")
+	log.Fatal(http.ListenAndServe(":5000", nil))
 }
 
 
@@ -33,45 +33,60 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func fetchCertHandler(w http.ResponseWriter, r *http.Request) {
-	domain := r.URL.Query().Get("domain")
-	if domain == "" {
-		http.Error(w, "Domain is required", http.StatusBadRequest)
-		return
-	}
+    domains := r.URL.Query().Get("domain") // Fetch input for domains
+    if domains == "" {
+        http.Error(w, "Domain is required", http.StatusBadRequest)
+        return
+    }
 
-	mxRecords, err := net.LookupMX(domain)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error looking up MX records: %v", err), http.StatusInternalServerError)
-		return
-	}
+    // Split the input using multiple delimiters: commas, spaces, and newlines
+    separators := strings.NewReplacer(",", " ", "\n", " ")
+    normalizedDomains := separators.Replace(domains)
+    domainList := strings.Fields(normalizedDomains) // Split by whitespace
 
-	if len(mxRecords) == 0 {
-		http.Error(w, "No MX records found", http.StatusNotFound)
-		return
-	}
+    var response strings.Builder
 
-	var response strings.Builder
-	response.WriteString(fmt.Sprintf("MX records for %s:\n", domain))
-	for _, mx := range mxRecords {
-		response.WriteString(fmt.Sprintf("- %s (Priority: %d)\n", mx.Host, mx.Pref))
-	}
+    for _, domain := range domainList {
+        domain = strings.TrimSpace(domain) // Clean up whitespace
+        if domain == "" {
+            continue
+        }
 
-	for _, mx := range mxRecords {
-		mxHost := strings.TrimSuffix(mx.Host, ".")
-		response.WriteString(fmt.Sprintf("\nFetching certificate from %s...\n", mxHost))
+        response.WriteString(fmt.Sprintf("Processing domain: %s\n", domain))
 
-		certDetails, err := certcheck.FetchCertWithStartTLS(mxHost)
-		if err != nil {
-			response.WriteString(fmt.Sprintf("Failed to fetch certificate from %s: %v\n", mxHost, err))
-			continue
-		}
+        mxRecords, err := net.LookupMX(domain)
+        if err != nil {
+            response.WriteString(fmt.Sprintf("Error looking up MX records for domain %s: %v\n", domain, err))
+            continue
+        }
 
-		response.WriteString(certDetails + "\n")
-	}
+        if len(mxRecords) == 0 {
+            response.WriteString(fmt.Sprintf("No MX records found for domain %s\n", domain))
+            continue
+        }
 
-	w.Header().Set("Content-Type", "text/plain")
-	w.Write([]byte(response.String()))
+        response.WriteString(fmt.Sprintf("MX records for %s:\n", domain))
+        for _, mx := range mxRecords {
+            response.WriteString(fmt.Sprintf("- %s (Priority: %d)\n", mx.Host, mx.Pref))
+        }
+
+        for _, mx := range mxRecords {
+            mxHost := strings.TrimSuffix(mx.Host, ".")
+            response.WriteString(fmt.Sprintf("\nFetching certificate from %s...\n", mxHost))
+
+            certDetails, err := certcheck.FetchCertWithStartTLS(mxHost)
+            if err != nil {
+                response.WriteString(fmt.Sprintf("Failed to fetch certificate from %s: %v\n", mxHost, err))
+                continue
+            }
+
+            response.WriteString(certDetails + "\n")
+        }
+
+        response.WriteString("\n---\n") // Separator for each domain
+    }
+
+    w.Header().Set("Content-Type", "text/plain")
+    w.Write([]byte(response.String()))
 }
-
-
 
