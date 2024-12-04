@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000" # Map port 5000 of the container to port 5000 of the host
+    volumes:
+      - ./static:/app/static # Bind mount the static folder to the container

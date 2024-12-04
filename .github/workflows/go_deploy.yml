@@ -1,0 +1,59 @@
+name: Deploy Go script to Hetzner
+on: push
+jobs:
+  Test:
+    name: Prepare Deploy
+    env:
+      ACTIONS_STEP_DEBUG: true
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test Website Online
+        run: |
+          server=analytical.dispelk9.de
+          if nc -z $server 22 2>/dev/null; then
+              echo "$server ✓"
+          else
+              echo "$server ✗"
+          fi
+
+  Deploy:
+    runs-on: ubuntu-latest
+    needs: Test
+    if: github.ref == 'refs/heads/master'
+    name: Deploy On Hetzner
+    env:
+      ACTIONS_STEP_DEBUG: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up SSH agent with the private key
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Docker Compose with ACT
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.IP }} << 'EOF'
+            
+            # Update the server and install git if necessary
+            sudo apt-get update -y && sudo apt-get install -y git
+            
+            # Remove old repository
+            sudo rm -rf /root/go-cert
+            
+            # Start the SSH agent and add the key with the passphrase
+            # cd /root/go-cert/
+             
+            sudo bash -c 'eval "$(ssh-agent -s)" && echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add /root/.ssh/id_rsa'
+            git clone git@github.com:Dispelk9/go-cert.git
+            
+            cd go-cert
+
+            docker compose down
+            docker compose build
+            docker compose up -d
+          
