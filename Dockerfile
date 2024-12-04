@@ -1,22 +1,25 @@
-# Use the official Go image to build the app
+# Use Go base image
 FROM golang:1.23.3
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy go.mod and go.sum files and download dependencies
+# Copy go.mod and go.sum and download dependencies
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy the rest of the application code
+# Copy application code
 COPY . .
+
+# Copy SSL certificates (ensure they exist in your local setup)
+COPY fullchain.pem /etc/ssl/certs/fullchain.pem
+COPY privkey.pem /etc/ssl/private/privkey.pem
 
 # Build the Go application
 RUN go build -o server main.go
 
-# Expose the port the app runs on
-EXPOSE 5000
+# Expose the HTTPS port
+EXPOSE 8443
 
-# Command to run the application
+# Command to run the server
 CMD ["./server"]
-

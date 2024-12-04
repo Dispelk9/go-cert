@@ -19,11 +19,15 @@ func main() {
 		http.ServeFile(w, r, "static/index.html")
 	})
 
-	// Handle fetch-cert endpoint using the fetchCertHandler function
-        http.HandleFunc("/fetch-cert", fetchCertHandler)
+	// Handle fetch-cert endpoint
+	http.HandleFunc("/fetch-cert", fetchCertHandler)
 
-	fmt.Println("Server is running on http://localhost:5000")
-	log.Fatal(http.ListenAndServe(":5000", nil))
+	// Define paths to certificate and key files
+	certFile := "/etc/ssl/certs/fullchain.pem" // Update to your certificate file path
+	keyFile := "/etc/ssl/private/privkey.pem" // Update to your private key file path
+
+	fmt.Println("Server is running on https://localhost:8443")
+	log.Fatal(http.ListenAndServeTLS(":8443", certFile, keyFile, nil)) // Use HTTPS with port 8443
 }
 
 
