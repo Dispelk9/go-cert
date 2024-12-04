@@ -5,6 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5000:5000" # Map port 5000 of the container to port 5000 of the host
+      - "8443:8443" # Map HTTPS port
     volumes:
-      - ./static:/app/static # Bind mount the static folder to the container
+      - ./fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
+      - ./privkey.pem:/etc/ssl/private/privkey.pem:ro
+      - ./static:/app/static
