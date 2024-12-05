@@ -3,6 +3,7 @@
     <head>
         <!--link rel="stylesheet" href="styles.css"-->
         <meta charset="UTF-8">
+        <link rel="stylesheet" href="/static/css/styles.css">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>SMTP Certificate Fetcher</title>
@@ -19,7 +20,7 @@
     <style>
     </style>
     <body>
-        <nav class="navbar navbar-light navbar-expand-lg bg-light ">
+        <nav class="navbar navbar-light navbar-expand-lg bg-dark ">
             <div class="container-fluid">
                 <div class="mx-4">
                     <a class="navbar-brand" href="./index">Certcheck ver1.0</a>
@@ -41,16 +42,19 @@
         <div class="container my-4">
             <div class="row justify-content-center">
               <h3> Checking certs on MXs using Go and Js.</h3>
+              <p>
+                the best way to multi checks list of MXs and show the digital certs if they are DV/OV or EV.
+              </p>
             </div>
         </div>
 
         <div class="container my-4">
             <div class="row justify-content-center">
-		<h1>Fetch SMTP Certificate</h1>
-		<form id="fetch-form" onsubmit="fetchCertificate(event)">
-                   <label for="domain">Domain:</label>
-                   <input type="text" id="domain" name="domain" required>
-		   <button type="submit" class="btn btn-primary" style="background-color: black; border-color: black;">Fetch Certificate</button>
+		        <h1>Fetch SMTP Certificate</h1>
+		        <form id="fetch-form" onsubmit="fetchCertificate(event)">
+                    <label for="domain">Domain:</label>
+                    <input type="text" id="domain" name="domain" class="full-width-input" required>
+		            <button type="submit" class="btn btn-primary" style="background-color: black; border-color: black;">Fetch Certificate</button>
                 </form>
                 <div id="result" style="margin-top: 20px;"></div>
             </div>

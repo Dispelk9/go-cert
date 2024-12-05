@@ -1,0 +1,7 @@
+.full-width-input {
+    width: 100%; /* Takes full width of the parent container */
+    max-width: 100%; /* Ensures it doesn’t exceed the parent */
+    padding: 8px; /* Adds some spacing inside the input */
+    font-size: 16px; /* Optional: Makes text more readable */
+    box-sizing: border-box; /* Includes padding and border in the total width */
+}
