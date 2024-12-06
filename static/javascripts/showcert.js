@@ -23,7 +23,9 @@ async function fetchCertificate(event) {
             const formattedData = data
                 .replace(/(Subject:.*)/g, "<b>$1</b>") // Bold the Subject line
                 .replace(/(Issuer:.*)/g, "<b>$1</b>") // Bold the Issuer line
-                .replace(/(Failed to.*)/g, "<b class=\"bold-red\">$1</b>");
+                .replace(/(Failed to.*)/g, "<b class=\"bold-red\">$1</b>")
+                .replace(/(Error looking.*)/g, "<b class=\"bold-red\">$1</b>");
+
             // Display the result in the result div
             resultDiv.innerHTML = `<pre>${formattedData}</pre>`;
         } else {
