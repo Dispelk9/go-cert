@@ -1,10 +1,13 @@
 package certcheck
 
 import (
-	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"net"
+	"log"
+        "net"
+	"net/smtp"
+	"strings"
+	"time"
 )
 
 // FetchCertWithStartTLS fetches the certificate from an SMTP server using STARTTLS.
@@ -33,7 +36,11 @@ func FetchCertWithStartTLS(host string) (string, error) {
 	// Fetch and print certificate
 	state := tlsConn.ConnectionState()
 	if len(state.PeerCertificates) > 0 {
-		return formatCertificateDetails(state.PeerCertificates[0], host), nil
+		certDetails := formatCertificateDetails(state.PeerCertificates[0], host)
+
+
+                return certDetails, nil
+		//return formatCertificateDetails(state.PeerCertificates[0], host), nil
 	}
 	return "No peer certificates found.\n", nil
 }
@@ -78,3 +85,19 @@ func formatCertificateDetails(cert *x509.Certificate, host string) string {
 		host, cert.Subject, cert.Issuer, cert.NotBefore, cert.NotAfter, cert.DNSNames)
 }
 
+
+// Send email with certificate details
+func sendEmail(to, subject, body, smtpServer, from, password string) error {
+	// Format email headers
+	msg := strings.Join([]string{
+		fmt.Sprintf("From: %s", from),
+		fmt.Sprintf("To: %s", to),
+		fmt.Sprintf("Subject: %s", subject),
+		"", // Empty line between headers and body
+		body,
+	}, "\r\n")
+
+	// Send the email
+	auth := smtp.PlainAuth("", from, password, smtpServer)
+	return smtp.SendMail(fmt.Sprintf("%s:587", smtpServer), auth, from, []string{to}, []byte(msg))
+}

@@ -17,12 +17,19 @@ async function fetchCertificate(event) {
 
         const data = await response.text();
 
-        if (response.ok) {
-            // Display the result in the result div
-            resultDiv.innerHTML = `<pre>${data}</pre>`;
+	if (response.ok) {
+        // Modify the data to make "Subject" and "Issuer" bold
+        const formattedData = data
+            .replace(/(Subject:.*)/g, "<b>$1</b>") // Bold the Subject line
+            .replace(/(Issuer:.*)/g, "<b>$1</b>") // Bold the Issuer line
+            .replace(/(Failed to.*)/g, "<b class=\"bold-red\">$1</b>"); 
+        // Display the result in the result div
+        resultDiv.innerHTML = `<pre>${formattedData}</pre>`;
         } else {
             resultDiv.innerHTML = `<span style="color: red;">Error: ${data}</span>`;
         }
+
+
     } catch (error) {
         console.error("Error fetching certificate:", error); // Debugging: Log any error
         resultDiv.innerHTML = `<span style="color: red;">Failed to fetch data: ${error.message}</span>`;
