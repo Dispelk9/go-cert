@@ -26,9 +26,9 @@ async function fetchCertificate(event) {
                 .replace(/(Failed to.*)/g, "<b class=\"bold-red\">$1</b>");
             // Display the result in the result div
             resultDiv.innerHTML = `<pre>${formattedData}</pre>`;
-            } else {
-                resultDiv.innerHTML = `<span style="color: red;">Error: ${data}</span>`;
-            }
+        } else {
+            resultDiv.innerHTML = `<span style="color: red;">Error: ${data}</span>`;
+        }
 
             
     } catch (error) {
