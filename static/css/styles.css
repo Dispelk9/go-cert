@@ -5,3 +5,31 @@
     font-size: 16px; /* Optional: Makes text more readable */
     box-sizing: border-box; /* Includes padding and border in the total width */
 }
+
+body {
+    background-color: #121212; /* Dark background color */
+    color: #ffffff;          /* White text color */
+    font-family: Arial, sans-serif; /* Clean font */
+    margin: 0;
+    padding: 0;
+}
+pre {
+    color: #ffffff;          /* White text for preformatted blocks */
+    background-color: #1e1e1e; /* Slightly lighter dark for contrast */
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+}
+span {
+    color: #ff5555; /* Red color for error messages */
+}
+b {
+    color: #00ff00; /* Bright green for bolded text */
+}
+.bold-red {
+    font-weight: bold; /* Make text bold */
+    color: red;        /* Red color for error messages */
+}
+.container {
+    padding: 20px;
+}
