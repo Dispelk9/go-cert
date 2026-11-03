@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: unless-stopped # come back after reboots / Docker daemon restarts
     ports:
       - "8443:8443" # Map HTTPS port
     volumes:
